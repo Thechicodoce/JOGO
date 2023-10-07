@@ -8,10 +8,10 @@ def anima_player():
     global player_index
 
     tela.blit(satiro_parado[int(player_index)], player_rect)
-    player_index += 0,1
+    player_index += 0.1
     if player_index > len(satiro_parado) - 1:
         player_index = 0
-        
+
 def anima_bot():
     pass
 
@@ -59,14 +59,20 @@ minotauro_parado = []
 
 for imagem in range(1, 13):
     img = pygame.image.load(f'assets/personagem/satiro1/ocio2/ocio2{imagem}.png').convert_alpha()
+    img = pygame.transform.scale(img, (420, 320))
     satiro_parado.append(img)
 
 for imagem in range(1, 19):
     img = pygame.image.load(f'assets/personagem/minotauro1/ocio2/ocio2{imagem}.png').convert_alpha()
+    img = pygame.transform.scale(img, (420, 320))
+    img = pygame.transform.flip(img, True, False)
     minotauro_parado.append(img)
 
-player_rect = satiro_parado[player_index].get_rect(midbottom = (300, 530))
-player2_rect = minotauro_parado[player_index].get_rect(midbottom = (300, 630))
+player_rect = satiro_parado[player_index].get_rect(midbottom = (200, 630))
+player2_rect = minotauro_parado[player_index].get_rect(midbottom = (1000, 600))
+
+#Altera a escala dos personagens
+#satiro_parado = pygame.transform.scale(satiro_parado, 420, 320)
 
 #Define o titulo da janela
 pygame.display.set_caption("Satyr - O Sátiro")
@@ -102,6 +108,17 @@ while True:
     tela.blit(img_arco, (0, 0))
     tela.blit(img_chao, (0,0))
     tela.blit(img_estatua, (0,0))
+
+    #Desenha o personagem
+    tela.blit(satiro_parado[int(player_index)], player_rect)
+    player_index += 0.05
+    if player_index > len(satiro_parado) - 1:
+        player_index = 0
+
+    tela.blit(minotauro_parado[int(player_index)], player2_rect)
+    player_index += 0.05
+    if player_index > len(minotauro_parado) - 1:
+        player_index = 0
 
     #Atualiza a tela com o conteudo
     pygame.display.update()
