@@ -16,7 +16,8 @@ def anima_bot():
     pass
 
 def rolagem_dado():
-    pass
+    rolagem_satiro = (randint(0, 20))
+    rolagem_bot = (randint(0, 20))
 
 #Inicializa o pygame
 pygame.init()
@@ -112,12 +113,12 @@ while True:
     #Desenha o personagem
     tela.blit(satiro_parado[int(player_index)], player_rect)
     player_index += 0.05
-    if player_index > len(satiro_parado) - 1:
+    if player_index > len(satiro_parado):
         player_index = 0
 
     tela.blit(minotauro_parado[int(player_index)], player2_rect)
     player_index += 0.05
-    if player_index > len(minotauro_parado) - 1:
+    if player_index > len(minotauro_parado):
         player_index = 0
 
     #Atualiza a tela com o conteudo
