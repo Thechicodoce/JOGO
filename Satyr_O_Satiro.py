@@ -5,7 +5,7 @@ from random import random
 
 #Funcoes
 def anima_player():
-    global player_index
+    global player_index, jogo_ativo
     
 
     if life_satiro > 0:
@@ -17,7 +17,8 @@ def anima_player():
         tela.blit(satiro_morrer[int(player_index)], player_rect)
         player_index += 0.05
         if player_index > len(satiro_morrer) -1:
-            player_index = 0
+            jogo_ativo = 0
+
         
 def andar_player():
     global player_index
@@ -48,7 +49,7 @@ def andar_player():
 
 def anima_bot():
     global player_index
-    global movimento_minotauro
+    global movimento_minotauro, jogo_ativo
 
     if life_bot > 0:
         tela.blit(minotauro_parado[int(player_index)], player2_rect)
@@ -59,7 +60,7 @@ def anima_bot():
         tela.blit(minotauro_morrer[int(player_index)], player2_rect)
         player_index += 0.05
         if player_index > len(minotauro_morrer):
-            player_index = 0
+            jogo_ativo = 0
             
 
 def andar_minotauro():
@@ -94,15 +95,13 @@ def rolagem():
     global rolagem_satiro
     global acaotecla
     rolagem_satiro = randint(0, 20)
-    txt_dado = fonte_pixel.render(f'Sua rolagem foi: {rolagem_satiro}', True, '#FFFFFF')
-    tela.blit(txt_dado, (55, 150))
+    
     acaotecla = 0
 
 def rolagem2():
     global rolagem_bot
     rolagem_bot = randint(0, 20)
-    txt_dado2 = fonte_pixel.render(f'Rolagem inimiga foi: {rolagem_bot}', True, '#FFFFFF')
-    tela.blit(txt_dado2, (940, 150))
+    
     
     #timer_txt = pygame.USEREVENT + 1
     #pygame.time.set_timer(timer_txt, 5000)
@@ -121,7 +120,9 @@ def placar_satiro():
     txt_potion1 = fonte_pixel.render(f'Potion: {potion1}', True, '#1AD400')
     txt_acao1 = fonte_pixel.render(f'1 - ATACAR', True, '#FFFFFF')
     txt_acao2 = fonte_pixel.render(f'2 - CURAR', True, f'{cor_acao2}')
+    txt_dado = fonte_pixel.render(f'Sua rolagem foi: {rolagem_satiro}', True, '#FFFFFF')
     
+    tela.blit(txt_dado, (55, 150))
     tela.blit(txt_life, (55,30))
     tela.blit(txt_potion1, (55, 60))
     tela.blit(txt_acao1, (55, 90))
@@ -131,6 +132,8 @@ def placar_satiro():
 def placar_bot():
     txt_life = fonte_pixel.render(f'Vida {life_bot}', True, '#D40000')
     txt_potion2 = fonte_pixel.render(f'Potion: {potion2}', True, '#1AD400')
+    txt_dado2 = fonte_pixel.render(f'Rolagem inimiga foi: {rolagem_bot}', True, '#FFFFFF')
+    tela.blit(txt_dado2, (940, 150))
     tela.blit(txt_life, (1115,30))
     tela.blit(txt_potion2, (1115, 60))
 
@@ -142,8 +145,8 @@ def atualizar_jogo():
     pass
 
 # Adicione essas variáveis globais para controlar a velocidade da animação
-player_anim_speed = 0.5
-bot_anim_speed = 0.5
+player_speed = 0.5
+bot_speed = 0.5
     
 
 #Inicializa o pygame
@@ -157,6 +160,9 @@ potion2 = 1
 movimento_satiro = 0
 movimento_minotauro = 0
 acaotecla = 0
+rolagem_satiro = 0
+rolagem_bot = 0
+jogo_ativo = 1
 
 #Cria a tela
 tamanho = (1280, 720)
@@ -178,6 +184,7 @@ img_arco = pygame.image.load('assets/fundo/fundo2/arco.png').convert_alpha()
 img_chao = pygame.image.load('assets/fundo/fundo2/chao.png').convert_alpha()
 img_estatua = pygame.image.load('assets/fundo/fundo2/estatua.png').convert_alpha()
 img_placar = pygame.image.load('assets/fundo/fundo2/placar.png').convert_alpha()
+img_fim = pygame.image.load('assets/fundo/fundo2/Battleground2.png').convert_alpha()
 
 #Altera a escala do plano de fundo
 img_fundo = pygame.transform.scale(img_fundo, tamanho)
@@ -188,6 +195,7 @@ img_arco = pygame.transform.scale(img_arco, tamanho)
 img_chao = pygame.transform.scale(img_chao, tamanho)
 img_estatua = pygame.transform.scale(img_estatua, tamanho)
 img_placar = pygame.transform.scale(img_placar, (1240, 180))
+img_fim = pygame.transform.scale(img_fim, tamanho)
 
 #Carrega personagens
 player_index = 0
@@ -286,7 +294,7 @@ relogio = pygame.time.Clock()
 #################################################################################################################
 
 #Loop
-while True:
+while jogo_ativo == 1:
     
     for evento in pygame.event.get():
         if evento.type == pygame.QUIT:
@@ -298,6 +306,10 @@ while True:
                 acaotecla = 1
             elif evento.key == pygame.K_2:
                 acaotecla = 2
+            elif evento.key == pygame.K_ESCAPE:
+                acaotecla == 3
+                pygame.quit()
+                exit()
 
     #Desenha o fundo na tela
     tela.blit(img_fundo, (0, 0))             
@@ -343,6 +355,7 @@ while True:
             life_satiro -= rolagem_bot
         elif life_bot <= 10:
             if potion2 > 0:
+                rolagem_bot = 0
                 life_bot += 10
                 potion2 -= 1
             else:
@@ -358,6 +371,7 @@ while True:
                 life_satiro -= rolagem_bot
             elif life_bot <= 10:
                 if potion2 > 0:
+                    rolagem_bot = 0
                     life_bot += 10
                     potion2 -= 1
                 else:
@@ -376,9 +390,23 @@ while True:
             timer_txt = pygame.USEREVENT + 1
             pygame.time.set_timer(timer_txt, 50)
             txt_acao = txt_acao1
-    
     #Atualiza a tela com o conteudo
     pygame.display.update()
     
     #Define a quantidade de frames por segundo
     relogio.tick(60)
+
+#Encerra o jogo
+
+tela.blit(img_fundo, (0, 0))
+tela.blit(img_placar, (20, 20))
+txt_evento = fonte_pixel.render('FIM DE JOGO!', True, '#FFFFFF')
+txt_dialogo = fonte_pixel.render('PRESSIONE ESC PARA SAIR', True, '#FFFFFF')
+tela.blit(txt_evento, (450, 30))
+tela.blit(txt_dialogo, (300, 60))
+
+#Atualiza a tela com o conteudo
+pygame.display.update()
+    
+#Define a quantidade de frames por segundo
+relogio.tick(60)
