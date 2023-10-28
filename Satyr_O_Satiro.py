@@ -12,40 +12,41 @@ def anima_player():
         tela.blit(satiro_parado[int(player_index)], player_rect)
         player_index += 0.05
         if player_index > len(satiro_parado) -1:
-            player_index = 0
+            player_index = False
     else:
         tela.blit(satiro_morrer[int(player_index)], player_rect)
         player_index += 0.05
         if player_index > len(satiro_morrer) -1:
-            jogo_ativo = 0
+            jogo_ativo = False
 
         
 def andar_player():
-    global player_index
+    global player_index, exe_mov1
     global movimento_satiro, relogio
 
     player_index = 0
 
     if not player_rect.colliderect(player2_rect):
         tela.blit(satiro_andar[int(player_index)], player_rect)
-        player_index += 0.005
-        movimento_satiro += 1
+        player_index += 0.0005
+        movimento_satiro += 0.5
         if player_index > len(satiro_andar) - 1:
             player_index = 0
     else:
         movimento_satiro = 0
         tela.blit(satiro_ataque[int(player_index)], player_rect)
-        player_index += 0.005
+        player_index += 0.0005
         if player_index > len(satiro_ataque) - 1:
             tela.blit(satiro_voltar[int(player_index)], player_rect)
             player_index += 0.005
-            movimento_satiro -= 5
+            movimento_satiro -= 0.5
             if not player_rect == satiro_rect:
-                movimento_satiro -= 5
+                movimento_satiro -= 0.5
             else:
                 movimento_satiro = 0  
 
-        player_rect.x += movimento_satiro          
+    player_rect.x += movimento_satiro    
+    exe_mov1 = False      
 
 def anima_bot():
     global player_index
@@ -59,27 +60,20 @@ def anima_bot():
     else:
         tela.blit(minotauro_morrer[int(player_index)], player2_rect)
         player_index += 0.05
-        if player_index > len(minotauro_morrer):
-            jogo_ativo = 0
+        if player_index == len(minotauro_morrer):
+            player_index += 0
             
 
 def andar_minotauro():
     global player_index
-    global movimento_minotauro
-
-    player2_rect.x -= movimento_minotauro
-   
-    tela.blit(minotauro_parado[int(player_index)], player2_rect)
-    player_index += 0.05
-    if player_index > len(minotauro_parado):
-        player_index = 0
+    global movimento_minotauro, exe_mov2
     
     if not player2_rect.colliderect(player_rect):
         tela.blit(minotauro_andar[int(player_index)], player2_rect)
         player_index += 0.005
         movimento_minotauro -= 5
     else:
-        movimento_satiro = 0
+        movimento_minotauro = 0
         tela.blit(minotauro_ataque[int(player_index)], player2_rect)
         player_index += 0.005
         if player_index > len(minotauro_ataque) - 1:
@@ -90,6 +84,8 @@ def andar_minotauro():
                 movimento_minotauro += 5
             else:
                 movimento_minotauro = 0 
+    player2_rect.x -= movimento_minotauro
+    exe_mov2 = False
 
 def rolagem():
     global rolagem_satiro
@@ -162,8 +158,10 @@ movimento_minotauro = 0
 acaotecla = 0
 rolagem_satiro = 0
 rolagem_bot = 0
-jogo_ativo = 1
-
+jogo_ativo = True
+exe_mov1 = False
+exe_mov2 = False
+    
 #Cria a tela
 tamanho = (1280, 720)
 tela = pygame.display.set_mode(tamanho)
@@ -278,8 +276,10 @@ for imagem in range(1, 16):
     minotauro_morrer.append(img)
 
 player_rect = satiro_parado[player_index].get_rect(midbottom = (200, 630))
+player_rect = player_rect.inflate(-200, 0)
 satiro_rect = satiro_parado[player_index].get_rect(midbottom = (200, 630))
 player2_rect = minotauro_parado[player_index].get_rect(midbottom = (1000, 600))
+player2_rect = player2_rect.inflate(-200, 0)
 bot_rect = minotauro_parado[player_index].get_rect(midbottom = (1000, 600))
 
 #Altera a escala dos personagens
@@ -294,7 +294,7 @@ relogio = pygame.time.Clock()
 #################################################################################################################
 
 #Loop
-while jogo_ativo == 1:
+while jogo_ativo == True:
     
     for evento in pygame.event.get():
         if evento.type == pygame.QUIT:
@@ -307,7 +307,6 @@ while jogo_ativo == 1:
             elif evento.key == pygame.K_2:
                 acaotecla = 2
             elif evento.key == pygame.K_ESCAPE:
-                acaotecla == 3
                 pygame.quit()
                 exit()
 
@@ -345,21 +344,27 @@ while jogo_ativo == 1:
     pygame.time.set_timer(timer_txt, 50)
     tela.blit(txt_acao, (460, 90))
 
+
+
     acaoescolhida = acaotecla
     if acaoescolhida == 1:
         rolagem()
-        andar_player()
+        exe_mov1 = True
+        while exe_mov1 == True:
+            andar_player()
+              
         life_bot -= rolagem_satiro
         if life_bot > 10:
             rolagem2()
+            while exe_mov2 == True:
+                andar_minotauro()
+                  
             life_satiro -= rolagem_bot
         elif life_bot <= 10:
             if potion2 > 0:
                 rolagem_bot = 0
                 life_bot += 10
                 potion2 -= 1
-            else:
-                pass
         
     elif acaoescolhida == 2:
         if potion1 > 0:
