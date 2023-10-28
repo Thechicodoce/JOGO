@@ -61,7 +61,7 @@ def anima_bot():
         tela.blit(minotauro_morrer[int(player_index)], player2_rect)
         player_index += 0.05
         if player_index == len(minotauro_morrer):
-            player_index += 0
+           jogo_ativo = False
             
 
 def andar_minotauro():
